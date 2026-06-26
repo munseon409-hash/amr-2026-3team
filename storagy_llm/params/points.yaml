@@ -1,0 +1,21 @@
+places:
+  origin:
+    x: -3.5
+    y: -0.7
+    qz: 0.0
+    qw: 1.0
+  kitchen:
+    x: 1.5
+    y: 1.0
+    qz: 0.0
+    qw: 1.0
+  table1:
+    x: -1.0
+    y:  2.0
+    qz: 0.0
+    qw: 1.0
+  table2:
+    x: 0.7
+    y: -1.5
+    qz: 0.0
+    qw: 1.0

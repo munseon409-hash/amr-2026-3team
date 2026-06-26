@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd"
+            schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>sar_bt_mission</name>
+  <version>0.1.0</version>
+  <description>
+    Search and Rescue (SAR) robot mission controller using
+    BehaviorTree.CPP v4 and BehaviorTree.ROS2 with Nav2 integration.
+    Capstone Design Project — ROS 2 Humble
+  </description>
+
+  <maintainer email="user@example.com">User</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- 빌드 도구 -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- 런타임 + 빌드 의존성 -->
+  <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
+  <depend>behaviortree_cpp</depend>
+  <depend>behaviortree_ros2</depend>
+  <depend>ament_index_cpp</depend>
+
+  <!-- ROS 메시지 타입 -->
+  <depend>nav2_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>lifecycle_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>tf2</depend>
+
+  <!-- 런치 의존성 -->
+  <exec_depend>storagy</exec_depend>
+  <exec_depend>nav2_bringup</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>python3-opencv</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+
+  <!-- 테스트 의존성 -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

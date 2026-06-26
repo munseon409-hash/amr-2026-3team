@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SAR (Search and Rescue) Mission Behavior Tree
+  ================================================
+  아키텍처: ReactiveFallback
+    - 1st child: Precondition(raw_detection==true) → Emergency Sequence
+    - 2nd child: Repeat(-1) → Patrol Sequence
+
+  ReactiveFallback는 매 Tick마다 첫 번째 자식부터 재평가한다.
+  raw_detection이 true가 되는 순간 순찰(Patrol)을 자동 인터럽트하고
+  긴급 구조(Emergency) 브랜치로 전환한다.
+  Nav2 RosActionNode는 Halt 시 CancelGoal을 자동 호출한다.
+-->
+<root BTCPP_format="4">
+  <BehaviorTree ID="SAR_Mission">
+
+    <ReactiveFallback name="Root">
+
+      <!-- ══════════════════════════════════════════════
+           [긴급 구조 브랜치]
+           raw_detection이 false이면 즉시 FAILURE 반환,
+           Patrol 브랜치로 폴스루(fall-through)한다.
+           ══════════════════════════════════════════════ -->
+      <Precondition if="raw_detection == 1" else="FAILURE">
+        <Sequence name="Emergency">
+
+          <!-- 1. 화면 x 좌표로 정렬 후 전방 1.5m 지점을 맵 좌표로 투영 -->
+          <AlignToTarget
+            target_point="{current_target_point}"
+            project_distance="1.5"
+            align_threshold="0.1"
+            kp="0.5"
+            output_pose="{locked_target_pose}"/>
+
+          <!-- 2. Nav2 주행 (Nav2 내장 복구: Backup / Spin / ClearCostmap) -->
+          <NavigateToTarget
+            target_pose="{locked_target_pose}"
+            action_name="navigate_to_pose"/>
+
+          <!-- 3. 전방 LiDAR로 접근 거리 확인 (min_distance 단위: m) -->
+          <SafeDistanceReached
+            min_distance="1.0"/>
+
+          <!-- 4. 음성 안내 및 가상 대화 (5초 대기) -->
+          <VoiceInteraction/>
+
+          <!-- 5. 관제 UI 전송용 구조 보고서(JSON) 토픽 발행 -->
+          <PublishRescueReport
+            target_pose="{locked_target_pose}"/>
+
+        </Sequence>
+      </Precondition>
+
+      <!-- ══════════════════════════════════════════════
+           [순찰 브랜치]
+           raw_detection이 false일 때 WP1 → WP2 무한 순회.
+           각 웨이포인트 도착 후 좌우 스캔(40° → 80° → 복귀) + 5초 홀드.
+           ══════════════════════════════════════════════ -->
+      <Repeat num_cycles="-1">
+        <Sequence name="Patrol">
+
+          <NavigateToWaypoint
+            name="MoveToWP1"
+            waypoint_pose="{waypoint_1}"
+            action_name="navigate_to_pose"/>
+
+          <ScanAtWaypoint name="ScanAtWP1"/>
+
+          <NavigateToWaypoint
+            name="MoveToWP2"
+            waypoint_pose="{waypoint_2}"
+            action_name="navigate_to_pose"/>
+
+          <ScanAtWaypoint name="ScanAtWP2"/>
+
+        </Sequence>
+      </Repeat>
+
+    </ReactiveFallback>
+
+  </BehaviorTree>
+</root>
